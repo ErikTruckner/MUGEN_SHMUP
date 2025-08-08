@@ -30,6 +30,10 @@ export const checkCollisions = (
         if (child.userData.isBuilding) {
           const objectBox = new THREE.Box3().setFromObject(child);
 
+          if (playerBox.intersectsBox(objectBox)) {
+            console.log("Player hit building with ID:", child.userData.id);
+          }
+
           setMaterialOpacity(child, 1);
         }
       });

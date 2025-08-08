@@ -57,7 +57,7 @@ export const usePlayerControls = (playerRef: React.RefObject<THREE.Mesh>) => {
     // --- Boundary Calculation ---
     const distance = camera.position.y - playerPosition.y;
     const aspect = size.width / size.height;
-    const vFov = (camera as THREE.PerspectiveCamera).fov * Math.PI / 180;
+    const vFov = ((camera as THREE.PerspectiveCamera).fov * Math.PI) / 180;
     const frustumHeight = 2 * Math.tan(vFov / 2) * distance;
     const frustumWidth = frustumHeight * aspect;
 
@@ -65,8 +65,8 @@ export const usePlayerControls = (playerRef: React.RefObject<THREE.Mesh>) => {
     const maxX = frustumWidth / 2;
 
     const basePlayerZ = camera.position.z - 10;
-    const minZ = basePlayerZ - 7;
-    const maxZ = basePlayerZ + 1;
+    const minZ = basePlayerZ - 15;
+    const maxZ = basePlayerZ + 5;
 
     // --- Clamping ---
     playerPosition.x = THREE.MathUtils.clamp(playerPosition.x, minX, maxX);

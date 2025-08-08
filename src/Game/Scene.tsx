@@ -1,10 +1,10 @@
 import { Canvas } from "@react-three/fiber";
 import Player from "./Player";
 import Environment from "./Environment";
-import Buildings from "./Buildings";
+import InfiniteBuildings from "./InfiniteBuildings";
 import CameraManager from "./CameraManager";
-
-import Road from "./Road";
+import InfiniteRoad from "./InfiniteRoad";
+import GameLogic from "./GameLogic";
 
 const Scene = () => {
 
@@ -12,10 +12,13 @@ const Scene = () => {
     <Canvas shadows camera={{ position: [0, 10, 10], fov: 60 }}>
       <ambientLight />
       <pointLight position={[10, 10, 10]} castShadow />
-      <Player />
+      <Player name="player" />
       <Environment />
-      <Buildings />
-      <Road />
+      <InfiniteBuildings name="infiniteBuildingsGroup" />
+      <InfiniteRoad />
+      <CameraManager />
+      <GameLogic />
+      <InfiniteRoad />
       <CameraManager />
     </Canvas>
   );

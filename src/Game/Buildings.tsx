@@ -1,5 +1,4 @@
 import Building from "./Building";
-import { useLoader } from "@react-three/fiber";
 import * as THREE from "three";
 
 type BuildingsProps = {
@@ -13,26 +12,17 @@ type BuildingsProps = {
     height: [number, number];
     depth: [number, number];
   };
+  textures: THREE.Texture[];
+  positionOffset?: THREE.Vector3;
 };
 
 const Buildings = ({
   gridSize = { x: 10, z: 50 },
   cellSize = 10,
   sizeRange = { width: [0.8, 1], height: [1, 10], depth: [0.8, 1] },
+  textures,
+  positionOffset = new THREE.Vector3(0, 0, 0),
 }: BuildingsProps) => {
-  const texturePaths = [
-    "/textures/buildings/buildingA/buildingA.webp",
-    "/textures/buildings/buildingB/buildingB.jpg",
-    "/textures/buildings/buildingC/buildingC.jpg",
-    "/textures/buildings/buildingD/buildingD.jpg",
-  ];
-
-  const textures = useLoader(THREE.TextureLoader, texturePaths);
-
-  textures.forEach((texture) => {
-    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-  });
-
   const buildings = [];
   for (let i = 0; i < gridSize.x; i++) {
     for (let j = 0; j < gridSize.z; j++) {
@@ -43,8 +33,8 @@ const Buildings = ({
         continue;
       }
 
-      const x = (i - gridSize.x / 2) * cellSize;
-      const z = (j - gridSize.z / 2) * cellSize;
+      const x = (i - gridSize.x / 2) * cellSize + positionOffset.x;
+      const z = (j - gridSize.z / 2) * cellSize + positionOffset.z;
 
       const width =
         (Math.random() * (sizeRange.width[1] - sizeRange.width[0]) +

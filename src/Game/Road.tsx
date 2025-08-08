@@ -1,15 +1,22 @@
-import { useLoader } from "@react-three/fiber";
-import * as THREE from "three";
+import { PlaneGeometry, MeshStandardMaterial, Texture, RepeatWrapping } from "three";
+import type { ThreeElements } from "@react-three/fiber";
 
-const Road = () => {
-  const roadTexture = useLoader(THREE.TextureLoader, "/textures/asphalt/asphalt_02_diff_1k.jpg");
-  roadTexture.wrapS = roadTexture.wrapT = THREE.RepeatWrapping;
-  roadTexture.repeat.set(10, 100);
+type MeshElementProps = ThreeElements['mesh'];
+
+interface RoadProps extends MeshElementProps {
+  width: number;
+  height: number;
+  texture: Texture;
+}
+
+const Road = ({ width, height, texture, ...props }: RoadProps) => {
+  texture.wrapS = texture.wrapT = RepeatWrapping as any;
+  texture.repeat.set(width / 10, height / 10); // Adjust repeat based on segment size
 
   return (
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]}>
-      <planeGeometry args={[100, 1000]} />
-      <meshStandardMaterial map={roadTexture} />
+    <mesh rotation={[-Math.PI / 2, 0, 0]} {...props}>
+      <planeGeometry args={[width, height]} />
+      <meshStandardMaterial map={texture} />
     </mesh>
   );
 };
