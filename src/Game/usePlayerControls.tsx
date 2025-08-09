@@ -2,11 +2,15 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { checkCollisions } from "./CollisionManager";
+import { useAtom, useAtomValue } from 'jotai';
+import { masterSpeedAtom, isMobileAtom, joystickInputAtom } from '../GameState';
 
-export const usePlayerControls = (playerRef: React.RefObject<THREE.Mesh>) => {
+export const usePlayerControls = (playerRef: React.RefObject<THREE.Group>) => {
   const { camera, size, scene } = useThree();
   const controls = useRef({ w: false, s: false, a: false, d: false });
-  const constantSpeed = 2.5;
+  const [masterSpeed] = useAtom(masterSpeedAtom);
+  const isMobile = useAtomValue(isMobileAtom);
+  const joystickInput = useAtomValue(joystickInputAtom);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -20,20 +24,24 @@ export const usePlayerControls = (playerRef: React.RefObject<THREE.Mesh>) => {
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("keyup", handleKeyUp);
+    if (!isMobile) {
+      window.addEventListener("keydown", handleKeyDown);
+      window.addEventListener("keyup", handleKeyUp);
+    }
 
     return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("keyup", handleKeyUp);
+      if (!isMobile) {
+        window.removeEventListener("keydown", handleKeyDown);
+        window.removeEventListener("keyup", handleKeyUp);
+      }
     };
-  }, []);
+  }, [isMobile]);
 
   useFrame((_, delta) => {
     if (!playerRef.current) return;
 
     // --- Constant Forward Motion ---
-    const forwardMovement = constantSpeed * delta;
+    const forwardMovement = masterSpeed * delta;
     camera.position.z -= forwardMovement;
     playerRef.current.position.z -= forwardMovement;
 
@@ -41,17 +49,22 @@ export const usePlayerControls = (playerRef: React.RefObject<THREE.Mesh>) => {
     const speed = 5 * delta;
     const playerPosition = playerRef.current.position;
 
-    if (controls.current.w) {
-      playerPosition.z -= speed;
-    }
-    if (controls.current.s) {
-      playerPosition.z += speed;
-    }
-    if (controls.current.a) {
-      playerPosition.x -= speed;
-    }
-    if (controls.current.d) {
-      playerPosition.x += speed;
+    if (isMobile) {
+      playerPosition.x += joystickInput.x * speed;
+      playerPosition.z -= joystickInput.y * speed; // Joystick Y controls forward/backward
+    } else {
+      if (controls.current.w) {
+        playerPosition.z -= speed;
+      }
+      if (controls.current.s) {
+        playerPosition.z += speed;
+      }
+      if (controls.current.a) {
+        playerPosition.x -= speed;
+      }
+      if (controls.current.d) {
+        playerPosition.x += speed;
+      }
     }
 
     // --- Boundary Calculation ---

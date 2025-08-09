@@ -2,11 +2,14 @@ import React, { useRef, useMemo } from 'react';
 import { useFrame, useLoader } from '@react-three/fiber';
 import * as THREE from 'three';
 import Buildings from './Buildings';
+import { useAtom } from 'jotai';
+import { masterSpeedAtom } from '../GameState';
 
 const SEGMENT_LENGTH = 500; // Length of each building segment
 const NUM_SEGMENTS = 3; // Number of segments to create a seamless loop
 
 const InfiniteBuildings = ({ name }: { name?: string }) => {
+  const [masterSpeed] = useAtom(masterSpeedAtom);
   const texturePaths = [
     "/textures/buildings/buildingA/buildingA.webp",
     "/textures/buildings/buildingB/buildingB.jpg",
@@ -41,7 +44,7 @@ const InfiniteBuildings = ({ name }: { name?: string }) => {
   useFrame((state, delta) => {
     if (groupRef.current) {
       // Simulate player movement, adjust speed as needed
-      groupRef.current.position.z += 8.33 * delta; 
+      groupRef.current.position.z += masterSpeed * delta; 
 
       // Loop segments
       segments.forEach((segment, index) => {

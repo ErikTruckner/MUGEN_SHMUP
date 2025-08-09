@@ -2,11 +2,14 @@ import React, { useRef, useMemo } from 'react';
 import { useFrame, useLoader } from '@react-three/fiber';
 import * as THREE from 'three';
 import Road from './Road';
+import { useAtom } from 'jotai';
+import { masterSpeedAtom } from '../GameState';
 
 const SEGMENT_LENGTH = 1000; // Length of each road segment
 const NUM_SEGMENTS = 3; // Number of segments to create a seamless loop
 
 const InfiniteRoad = () => {
+  const [masterSpeed] = useAtom(masterSpeedAtom);
   const roadTexture = useLoader(THREE.TextureLoader, "/textures/asphalt/asphalt_02_diff_1k.jpg");
   const segments = useMemo(() => {
     const segs = [];
@@ -29,7 +32,7 @@ const InfiniteRoad = () => {
   useFrame((state, delta) => {
     if (groupRef.current) {
       // Simulate player movement, adjust speed as needed
-      groupRef.current.position.z += 8.33 * delta; 
+      groupRef.current.position.z += masterSpeed * delta; 
 
       // Loop segments
       segments.forEach((segment, index) => {
