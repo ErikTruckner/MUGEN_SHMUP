@@ -20,7 +20,6 @@ export const checkCollisions = (
   objects: THREE.Object3D[]
 ) => {
   const playerBox = new THREE.Box3().setFromObject(player);
-  const cameraPosition = camera.position;
 
   const currentlyOccluded = new Set<THREE.Mesh>();
 

@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { useSetAtom } from 'jotai';
 import { joystickInputAtom } from '../../GameState';
 
@@ -11,12 +11,7 @@ const MobileJoystick = () => {
   const knobRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
 
-  const handleTouchStart = (e: TouchEvent) => {
-    setIsDragging(true);
-    handleTouchMove(e);
-  };
-
-  const handleTouchMove = (e: TouchEvent) => {
+  const handleTouchMove = useCallback((e: TouchEvent) => {
     if (!isDragging || !joystickRef.current || !knobRef.current) return;
 
     const joystickRect = joystickRef.current.getBoundingClientRect();
@@ -44,15 +39,20 @@ const MobileJoystick = () => {
     const normalizedY = -deltaY / maxDistance; // Y-axis is inverted in screen coordinates
 
     setJoystickInput({ x: normalizedX, y: normalizedY });
-  };
+  }, [isDragging, setJoystickInput]);
 
-  const handleTouchEnd = () => {
+  const handleTouchStart = useCallback((e: TouchEvent) => {
+    setIsDragging(true);
+    handleTouchMove(e);
+  }, [handleTouchMove]);
+
+  const handleTouchEnd = useCallback(() => {
     setIsDragging(false);
     if (knobRef.current) {
       knobRef.current.style.transform = `translate(0px, 0px)`;
     }
     setJoystickInput({ x: 0, y: 0 });
-  };
+  }, [setJoystickInput]);
 
   useEffect(() => {
     const joystickElement = joystickRef.current;
@@ -71,7 +71,7 @@ const MobileJoystick = () => {
         joystickElement.removeEventListener('touchcancel', handleTouchEnd);
       }
     };
-  }, [isDragging]); // Re-run effect when isDragging changes to ensure correct event listeners
+  }, [handleTouchStart, handleTouchMove, handleTouchEnd]);
 
   return (
     <div

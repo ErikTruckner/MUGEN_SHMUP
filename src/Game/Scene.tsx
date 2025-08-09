@@ -18,8 +18,6 @@ const Scene = () => {
       <InfiniteRoad />
       <CameraManager />
       <GameLogic />
-      <InfiniteRoad />
-      <CameraManager />
     </Canvas>
   );
 };
